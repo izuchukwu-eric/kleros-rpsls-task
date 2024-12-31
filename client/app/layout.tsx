@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ContextProvider from "@/context";
 import { headers } from "next/headers";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default async function RootLayout({
       >
         <ContextProvider cookies={cookies}>
           {children}
+          <Toaster duration={8000} position="bottom-left" />
         </ContextProvider>
       </body>
     </html>

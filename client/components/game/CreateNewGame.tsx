@@ -6,15 +6,25 @@ import { Swords } from 'lucide-react'
 import { z } from "zod";
 import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod";
+import { encodePacked, keccak256, parseEther } from 'viem';
+import { useAccount, useWalletClient } from 'wagmi';
+import { sepolia } from "@reown/appkit/networks"
 
 import { cn } from '@/lib/utils'
 import { CreateNewGameSchema } from '@/schemas'
 import { Form, FormControl, FormField, FormLabel, FormItem, FormMessage } from '../ui/form'
+import { toast } from 'sonner'
+import generateSalt from '@/utils/generateSalt'
+import { byteCode, contractABI, moves } from '@/utils/constants'
+import { useRouter } from 'next/navigation'
 
 
 const CreateNewGame = () => {
+    const router = useRouter();
     const [selectedMove, setSelectedMove] = useState<string>('');
     const [isPending, startTransition] = useTransition();
+    const { address } = useAccount();
+    const { data: walletClient } = useWalletClient();
 
     type CreateNewGameFormData = z.infer<typeof CreateNewGameSchema>;
 
@@ -33,8 +43,47 @@ const CreateNewGame = () => {
     }
 
     const onSubmit = (values: CreateNewGameFormData) => {
-        startTransition(() => {
+        startTransition(async () => {
             console.log(values)
+            const player2 = values.opponentAddress;
+            const stake = values.stake;
+            const move = values.move;
+
+            const salt = generateSalt(16);
+    
+            if (player2 === address) {
+                toast.error("Oppenent address cannot be the same as connected address");
+                return;
+            }
+
+            const moveIndex = moves.indexOf(move?.toString() ?? '');
+
+            const hash = keccak256(
+                encodePacked(['uint8', 'uint256'], [moveIndex + 1, BigInt(salt)])
+            );
+
+            try {
+                const txHash = await walletClient?.deployContract({
+                    abi: contractABI,
+                    account: address,
+                    args: [hash, player2],
+                    bytecode: byteCode,
+                    value: parseEther(stake?.toString() ?? '0'),
+                    chain: sepolia,
+                });
+
+                // store salt and move in local storage
+                localStorage.setItem(
+                    `waiting-room-${txHash}`,
+                    JSON.stringify({ salt: BigInt(salt).toString(), move: moveIndex })
+                );
+
+                router.push(`/waiting-room/${txHash}`);
+                
+            } catch (error) {
+                console.log("Error creating new game:", error);
+                toast.error("An error occured while creating a new game");
+            }
         })
     }
 

@@ -11,7 +11,7 @@ http://www.wtfpl.net/ for more details. */
 
 pragma solidity ^0.4.26;
 
-contract RPS{
+contract RPS {
     address public j1; // The first player creating the contract.
     address public j2; // The second player.
     enum Move {Null, Rock, Paper, Scissors, Spock, Lizard} // Possible moves. Note that if the parity of the moves is the same the lower one wins, otherwise the higher one. 
