@@ -8,7 +8,7 @@ import Player1GameDisplay from './Player1GameDisplay';
 import Player2GameDisplay from './Player2GameDisplay';
 import getTimeLeft from '@/utils/getTimeLeft';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Copy, ExternalLink, Swords, Timer, Wallet } from 'lucide-react';
+import { Copy, ExternalLink, Swords, Wallet } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 
@@ -141,7 +141,7 @@ const GameDisplay: React.FC<GameDisplayProps> = ({
                     asChild
                   >
                     <a
-                      href={`https://etherscan.io/address/${gameContract}`}
+                      href={`https://sepolia.etherscan.io/address/${gameContract}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

@@ -197,7 +197,7 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
                 </>
               )}
 
-              {!hasPlayer2Moved && timeLeft <= 0 && (
+              {canPlayer1ClaimStake && !hasPlayer2Moved && timeLeft <= 0 && (
                 <p className="text-xs w-full text-slate-400">
                   (please refresh if you don&apos;t see the button to claim stake)
                 </p>
