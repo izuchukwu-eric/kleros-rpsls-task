@@ -74,11 +74,11 @@ const CreateNewGame = () => {
 
                 // store salt and move in local storage
                 localStorage.setItem(
-                    `waiting-room-${txHash}`,
+                    `lobby-room-${txHash}`,
                     JSON.stringify({ salt: BigInt(salt).toString(), move: moveIndex })
                 );
 
-                router.push(`/waiting-room/${txHash}`);
+                router.push(`/lobby/${txHash}`);
                 
             } catch (error) {
                 console.log("Error creating new game:", error);
@@ -132,7 +132,6 @@ const CreateNewGame = () => {
                                                     disabled={isPending}
                                                     type="number"
                                                     placeholder="0.1"
-                                                    min="0.1"
                                                     step="any"
                                                     onChange={(val) => field.onChange(val)}
                                                     className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500"
@@ -177,7 +176,10 @@ const CreateNewGame = () => {
                             </div>
                         </CardContent>
                         <CardFooter>
-                        <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+                        <Button 
+                            disabled={isPending}
+                            className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+                        >
                             <Swords className="mr-2 h-4 w-4" />
                             Deploy Challenge
                         </Button>
