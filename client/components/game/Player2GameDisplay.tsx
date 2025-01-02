@@ -10,6 +10,9 @@ import { GameState } from '@/types';
 import getTimeLeft from '@/utils/getTimeLeft';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
+import { Progress } from '../ui/progress';
+import { cn } from '@/lib/utils';
+import { Timer, Trophy } from 'lucide-react';
 
 type Player2GameDisplay = {
   gameContract: `0x${string}`;
@@ -114,73 +117,55 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
   }, [gameState.canPlayer2ClaimStake]);
 
   return (
-    <div className="w-2/3 my-8 border border-gray-900 p-4 flex flex-col justify-between space-y-4">
-      <div className="text-xl">
-        <span className="font-light">Player 1&apos;s move: </span>
-        <span className="font-bold italic">
-          {hasPlayer1Revealed
+    <div className="grid gap-4 p-4 rounded-lg bg-slate-900">
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-slate-400">Player 1&apos;s move: </h3>
+        <div className="flex items-center gap-2 text-white">
+            <span className="font-semibold">
+                {hasPlayer1Revealed
             ? 'Player 1 has revealed their move'
             : 'Yet to be revealed'}
-        </span>
+            </span>
+        </div>
       </div>
+
       {!hasPlayer2Moved && (
-        <div className="text-xl">
-          <span className="font-light">Time left for player 2: </span>
-          <span className="font-bold">
-            {timeLeft > 0 ? (
-              `${Math.floor(timeLeft / 1000 / 60)}:${
-                Math.floor(timeLeft / 1000) % 60
-              }`
-            ) : (
-              <div className="inline-flex items-center space-x-4">
-                <span>
-                  Time is up!{' '}
-                  {hasPlayer1ClaimedStake
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+              <span className="text-slate-400 flex items-center gap-1">
+                <Timer className="h-4 w-4" />
+                Time Remaining for player 2:
+              </span>
+              <span className="text-emerald-500 font-medium">
+                {timeLeft > 0 ? 
+                  `${Math.floor(timeLeft / 1000 / 60)}:${
+                    Math.floor(timeLeft / 1000) % 60
+                  }` : 
+                  ` Time is up!
+                  ${hasPlayer1ClaimedStake
                     ? 'Player 1 has reclaimed stake'
-                    : 'But you can still play your move'}
-                </span>
-              </div>
-            )}
-          </span>
+                    : 'But you can still play your move'}`
+                }
+              </span>
+          </div>
+          <Progress 
+              value={timeLeft} 
+              className={cn(
+                  "bg-gradient-to-r h-2 bg-slate-700",
+                  timeLeft > 50 && "from-emerald-500 to-cyan-500",
+                  timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
+                  timeLeft <= 20 && "from-red-500 to-rose-500"
+              )}
+          />
         </div>
       )}
-      {hasPlayer2Moved && !hasPlayer1Revealed && (
-        <div className="text-xl">
-          <span className="font-light">
-            Time left for player 1 to reveal move:{' '}
-          </span>
-          <span className="font-bold">
-            {timeLeft > 0 ? (
-              `${Math.floor(timeLeft / 1000 / 60)}:${
-                Math.floor(timeLeft / 1000) % 60
-              }`
-            ) : (
-              <div className="inline-flex items-center space-x-4">
-                <span>Time is up!</span>
-                {canPlayer2ClaimStake && (
-                  <Button
-                    disabled={!canPlayer2ClaimStake || showSpinner}
-                    onClick={handleClaimStake}
-                  >
-                    {showSpinner ? <Spinner /> : 'Claim Stake'}
-                  </Button>
-                )}
-              </div>
-            )}
-          </span>
-          {hasPlayer2Moved && !hasPlayer1Revealed && timeLeft <= 0 && (
-            <p className="text-xs w-full">
-              (please refresh if you don&apos;t see the button to claim stake)
-            </p>
-          )}
-        </div>
-      )}
+
       {!hasPlayer1ClaimedStake && (
         <div className="text-xl">
           {!hasPlayer2Moved ? (
             <>
               <div className="flex items-center font-bold">
-                <span className="font-light">Select your move:</span>
+                <h3 className="text-sm font-medium text-slate-400">Select your move:</h3>
                 <div className="flex space-x-2 ml-8">
                   {moves.map((move, index) => {
                     return (
@@ -194,7 +179,7 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
                         />
                         <label
                           htmlFor={move}
-                          className="border border-gray-500 rounded-lg p-2 text-sm peer-checked:bg-white peer-checked:text-black cursor-pointer"
+                          className="border border-gray-500 rounded-lg p-2 text-sm text-white peer-checked:bg-white peer-checked:text-black cursor-pointer"
                         >
                           {move}
                         </label>
@@ -205,7 +190,7 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
               </div>
               <Button
                 onClick={() => handleSubmit()}
-                className="mt-3"
+                className="w-full mt-5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
                 disabled={showSpinner}
               >
                 {showSpinner ? <Spinner /> : 'Submit Move'}
@@ -213,9 +198,60 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
             </>
           ) : (
             <>
-              <span className="font-light">Your move: </span>
-              <span className="font-bold italic">{moves[player2Move - 1]}</span>
+              <h3 className="text-sm font-medium text-slate-400">Your move: </h3>
+              <div className="flex items-center gap-2 text-white">
+                <span className="font-semibold">{moves[player2Move - 1]}</span>
+               </div>
             </>
+          )}
+        </div>
+      )}
+
+      {hasPlayer2Moved && !hasPlayer1Revealed && (
+        <div className="space-y-2">
+          {timeLeft > 0 ? (
+            <>
+              <div className="flex justify-between text-sm">
+                  <span className="text-slate-400 flex items-center gap-1">
+                      <Timer className="h-4 w-4" />
+                      Time Remaining for player 1 to reveal move:
+                  </span>
+                  <span className="text-emerald-500 font-medium">
+                    {timeLeft > 0 ? 
+                    `${Math.floor(timeLeft / 1000 / 60)}:${
+                      Math.floor(timeLeft / 1000) % 60
+                    }` : 'Time is up!'}
+                  </span>
+              </div>
+              <Progress 
+                  value={timeLeft} 
+                  className={cn(
+                      "bg-gradient-to-r h-2 bg-slate-700",
+                      timeLeft > 50 && "from-emerald-500 to-cyan-500",
+                      timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
+                      timeLeft <= 20 && "from-red-500 to-rose-500"
+                  )}
+              />
+            </>
+          ) : (
+            <>
+              {canPlayer2ClaimStake && (
+                <Button 
+                  disabled={!canPlayer2ClaimStake || showSpinner}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+                  onClick={handleClaimStake}
+                >
+                  <Trophy className="mr-2 h-4 w-4" />
+                  {showSpinner ? <Spinner /> : 'Claim Stake'}
+                </Button>
+              )}
+            </>
+          )}
+
+          {hasPlayer2Moved && !hasPlayer1Revealed && timeLeft <= 0 && (
+            <p className="text-xs w-full text-slate-400">
+              (please refresh if you don&apos;t see the button to claim stake)
+            </p>
           )}
         </div>
       )}

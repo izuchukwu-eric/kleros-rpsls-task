@@ -89,7 +89,7 @@ const Page = ({ params }: { params: Promise<{ txHash: string }> }) => {
   } else if (isSuccess && data) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full space-y-8 py-20">
-        <h2 className="text-xl font-bold italic">
+        <h2 className="text-xl font-bold italic text-white">
           Your game has been created. Enjoy!
         </h2>
         {showGameLink && (
