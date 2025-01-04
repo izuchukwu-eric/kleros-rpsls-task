@@ -11,8 +11,6 @@ import getTimeLeft from '@/utils/getTimeLeft';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { Timer, Trophy } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Progress } from '../ui/progress';
 
 type Player1GameDisplay = {
   gameContract: `0x${string}`;
@@ -172,15 +170,6 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
                             }` : 'Time is up!'}
                           </span>
                       </div>
-                      <Progress 
-                          value={timeLeft} 
-                          className={cn(
-                              "bg-gradient-to-r h-2 bg-slate-700",
-                              timeLeft > 50 && "from-emerald-500 to-cyan-500",
-                              timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
-                              timeLeft <= 20 && "from-red-500 to-rose-500"
-                          )}
-                      />
                   </>
               ) : (
                 <>
@@ -207,7 +196,6 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
 
       {hasPlayer2Moved && !hasPlayer1Revealed && (
         <div className="space-y-2">
-          {timeLeft > 0 ? (
             <>
               <div className="flex justify-between text-sm">
                   <span className="text-slate-400 flex items-center gap-1">
@@ -218,36 +206,23 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
                     {timeLeft > 0 ? 
                     `${Math.floor(timeLeft / 1000 / 60)}:${
                       Math.floor(timeLeft / 1000) % 60
-                    }` : `Time is up!{' '}
+                    }` : `Time is up!
                       ${hasPlayer2ClaimedStake
                       ? 'Player 2 has reclaimed stake'
                       : 'But you can still reveal your move'}`}
                   </span>
               </div>
-              <Progress 
-                  value={timeLeft} 
-                  className={cn(
-                      "bg-gradient-to-r h-2 bg-slate-700",
-                      timeLeft > 50 && "from-emerald-500 to-cyan-500",
-                      timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
-                      timeLeft <= 20 && "from-red-500 to-rose-500"
-                  )}
-              />
             </>
-          ) : (
-            <>
-              {!hasPlayer2ClaimedStake && (
-                <Button 
-                  disabled={showSpinner}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
-                  onClick={() => handleRevealMove()}
-                >
-                  <Trophy className="mr-2 h-4 w-4" />
-                  {showSpinner ? <Spinner /> : 'Reveal Move'}
-                </Button>
-              )}
-            </>
-          )}
+            {!hasPlayer2ClaimedStake && (
+              <Button 
+                disabled={showSpinner}
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+                onClick={() => handleRevealMove()}
+              >
+                <Trophy className="mr-2 h-4 w-4" />
+                {showSpinner ? <Spinner /> : 'Reveal Move'}
+              </Button>
+            )}
         </div>
       )}
     </div>

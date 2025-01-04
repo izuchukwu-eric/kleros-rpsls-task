@@ -10,8 +10,6 @@ import { GameState } from '@/types';
 import getTimeLeft from '@/utils/getTimeLeft';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
-import { Progress } from '../ui/progress';
-import { cn } from '@/lib/utils';
 import { Timer, Trophy } from 'lucide-react';
 
 type Player2GameDisplay = {
@@ -63,6 +61,12 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
   });
 
   React.useEffect(() => {
+    if (canPlayer2ClaimStake) {
+      refetch();
+    }
+  }, [canPlayer2ClaimStake]);
+
+  React.useEffect(() => {
     if (waitForPlayTxData || waitForClaimTxData) {
       refetch();
       setShowSpinner(false);
@@ -81,38 +85,49 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
   const handleSubmit = React.useCallback(async () => {
     setShowSpinner(true);
 
-    writeContract({
-        address: gameContract,
-        abi: contractABI,
-        functionName: 'play',
-        args: [move],
-        value: stake,
-    });
-
-    if (error) {
-        toast.error((error.cause as any)?.shortMessage ?? error.message);
-        setShowSpinner(false);
-        return;
-    } else {
-        setWaitForPlayTxHash(hash);
+    try {
+      writeContract({
+          address: gameContract,
+          abi: contractABI,
+          functionName: 'play',
+          args: [move],
+          value: stake,
+      });
+  
+      if (error) {
+          toast.error((error.cause as any)?.shortMessage ?? error.message);
+          setShowSpinner(false);
+          return;
+      } else {
+          setWaitForPlayTxHash(hash);
+      }
+    } catch (error) {
+      console.log("Error submitting move:", error);
+      setShowSpinner(false);
+      toast.error("An error occured while submitting move");
     }
   }, [move]);
 
   const handleClaimStake = React.useCallback(async () => {
     setShowSpinner(true);
 
-    writeContract({
-        address: gameContract,
-        abi: contractABI,
-        functionName: 'j1Timeout',
-    });
-
-    if (error) {
-        toast.error((error.cause as any)?.shortMessage ?? error.message);
-        setShowSpinner(false);
-        return;
-    } else {
-        setWaitForClaimTxHash(hash);
+    try {
+      writeContract({
+          address: gameContract,
+          abi: contractABI,
+          functionName: 'j1Timeout',
+      });
+  
+      if (error) {
+          toast.error((error.cause as any)?.shortMessage ?? error.message);
+          setShowSpinner(false);
+          return;
+      } else {
+          setWaitForClaimTxHash(hash);
+      }
+    } catch (error) {
+      console.log("Error claiming stake:", error);
+      toast.error("An error occured while claiming stake");
     }
   }, [gameState.canPlayer2ClaimStake]);
 
@@ -148,15 +163,6 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
                 }
               </span>
           </div>
-          <Progress 
-              value={timeLeft} 
-              className={cn(
-                  "bg-gradient-to-r h-2 bg-slate-700",
-                  timeLeft > 50 && "from-emerald-500 to-cyan-500",
-                  timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
-                  timeLeft <= 20 && "from-red-500 to-rose-500"
-              )}
-          />
         </div>
       )}
 
@@ -223,15 +229,6 @@ const Player2GameDisplay: React.FC<Player2GameDisplay> = ({
                     }` : 'Time is up!'}
                   </span>
               </div>
-              <Progress 
-                  value={timeLeft} 
-                  className={cn(
-                      "bg-gradient-to-r h-2 bg-slate-700",
-                      timeLeft > 50 && "from-emerald-500 to-cyan-500",
-                      timeLeft <= 50 && timeLeft > 20 && "from-yellow-500 to-orange-500",
-                      timeLeft <= 20 && "from-red-500 to-rose-500"
-                  )}
-              />
             </>
           ) : (
             <>
