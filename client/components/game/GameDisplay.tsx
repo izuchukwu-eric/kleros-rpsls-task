@@ -29,7 +29,6 @@ const GameDisplay: React.FC<GameDisplayProps> = ({
     stake,
     player1,
     player2,
-    player1MoveHash,
     player2Move,
     timeout,
     lastAction,

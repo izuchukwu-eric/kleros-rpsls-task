@@ -11,7 +11,7 @@ const Header = () => {
               RPSLS Arena
             </h1>
           </div>
-          {/**@ts-ignore */}
+          {/**@ts-expect-error */}
           <appkit-button />
         </div>
     </header>

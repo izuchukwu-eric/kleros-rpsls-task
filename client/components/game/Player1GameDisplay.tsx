@@ -2,6 +2,7 @@ import React from 'react';
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
+  type BaseError
 } from 'wagmi';
 
 import { contractABI, moves } from '@/utils/constants';
@@ -102,7 +103,7 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
     });
 
     if (error) {
-      toast.error((error.cause as any)?.shortMessage ?? error.message);
+      toast.error((error.cause as BaseError)?.shortMessage ?? error.message);
       setShowSpinner(false);
       return;
     } else {
@@ -124,7 +125,7 @@ const Player1GameDisplay: React.FC<Player1GameDisplay> = ({
     });
 
     if (error) {
-        toast.error((error.cause as any)?.shortMessage ?? error.message);
+        toast.error((error.cause as BaseError)?.shortMessage ?? error.message);
         setShowSpinner(false);
         return;
     } else {
